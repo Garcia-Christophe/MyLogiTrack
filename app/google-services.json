@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "965734230838",
+    "project_id": "mylogitrack",
+    "storage_bucket": "mylogitrack.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:965734230838:android:08641743e27b432d1e6197",
+        "android_client_info": {
+          "package_name": "com.example.mylogitrack"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMk2j0MKsr85McDj1JgRFKKGxDOCBHfKY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
