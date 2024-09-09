@@ -1,17 +1,21 @@
-package com.example.mylogitrack.ui.notifications
+package com.example.mylogitrack.ui.new_checkinout
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.example.mylogitrack.databinding.FragmentNotificationsBinding
+import com.example.mylogitrack.R
+import com.example.mylogitrack.databinding.FragmentNewCheckinoutBinding
+import com.github.gcacace.signaturepad.views.SignaturePad
 
-class NotificationsFragment : Fragment() {
+class NewCheckInOutFragment : Fragment() {
 
-    private var _binding: FragmentNotificationsBinding? = null
+    private var _binding: FragmentNewCheckinoutBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -22,14 +26,14 @@ class NotificationsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val notificationsViewModel =
-            ViewModelProvider(this).get(NotificationsViewModel::class.java)
+        val dashboardViewModel =
+            ViewModelProvider(this).get(NewCheckInOutViewModel::class.java)
 
-        _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
+        _binding = FragmentNewCheckinoutBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textNotifications
-        notificationsViewModel.text.observe(viewLifecycleOwner) {
+        val textView: TextView = binding.textDashboard
+        dashboardViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
         return root

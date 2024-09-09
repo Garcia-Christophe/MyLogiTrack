@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">MyLogiTrack</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_checkinout_list">États des lieux</string>
+    <string name="title_new_checkinout">Nouveau</string>
+    <string name="title_signature">Signature</string>
     <string name="login">Se connecter</string>
     <string name="email">Email</string>
     <string name="password">Mot de passe</string>
