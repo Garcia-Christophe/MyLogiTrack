@@ -18,8 +18,8 @@
         tools:layout="@layout/fragment_new_checkinout" />
 
     <fragment
-        android:id="@+id/navigation_signature"
-        android:name="com.example.mylogitrack.ui.signature.SignatureFragment"
-        android:label="@string/title_signature"
-        tools:layout="@layout/fragment_signature" />
+        android:id="@+id/navigation_photos"
+        android:name="com.example.mylogitrack.ui.photos.PhotoFragment"
+        android:label="@string/title_photos"
+        tools:layout="@layout/fragment_photo" />
 </navigation>
