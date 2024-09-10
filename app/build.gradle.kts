@@ -16,6 +16,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        renderscriptSupportModeEnabled = true
+        renderscriptTargetApi = 21
     }
 
     buildTypes {
@@ -49,10 +52,21 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.6")
-    implementation("com.google.firebase:firebase-auth:23.0.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    // Firebase
+    implementation("com.google.firebase:firebase-auth:23.0.0")
+    // Signature
     implementation("com.github.gcacace:signature-pad:1.3.1")
+    // PDF
     implementation("com.itextpdf:itext7-core:7.2.2")
+    // Photo
+    implementation("com.github.dhaval2404:imagepicker:2.1")
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(files("libs/ds-photo-editor-sdk-v10.aar"))
+    implementation("io.reactivex.rxjava2:rxjava:2.1.0")
+    implementation("io.reactivex.rxjava2:rxandroid:2.0.1")
+    implementation("com.github.bumptech.glide:glide:4.14.2")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.14.2")
 }
