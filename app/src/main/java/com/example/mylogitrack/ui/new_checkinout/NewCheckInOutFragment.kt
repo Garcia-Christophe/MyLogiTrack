@@ -2,6 +2,7 @@ package com.example.mylogitrack.ui.new_checkinout
 
 import android.app.AlertDialog
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Environment
 import android.view.LayoutInflater
@@ -11,14 +12,18 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mylogitrack.R
 import com.example.mylogitrack.databinding.FragmentNewCheckinoutBinding
 import com.github.gcacace.signaturepad.views.SignaturePad
+import com.itextpdf.io.font.constants.StandardFonts
 import com.itextpdf.io.image.ImageDataFactory
 import com.itextpdf.io.source.ByteArrayOutputStream
+import com.itextpdf.kernel.font.PdfFont
+import com.itextpdf.kernel.font.PdfFontFactory
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.layout.Document
@@ -26,7 +31,11 @@ import com.itextpdf.layout.element.Cell
 import com.itextpdf.layout.element.Image
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Table
+import com.itextpdf.layout.properties.TextAlignment
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 class NewCheckInOutFragment : Fragment() {
@@ -35,13 +44,21 @@ class NewCheckInOutFragment : Fragment() {
     private lateinit var roomAdapter: RoomAdapter
     private lateinit var signatureView: ImageView
 
-    // Liste des pièces
-    private val rooms = listOf(
+    private val defaultRooms = listOf(
         RoomItem("Salon", ""),
         RoomItem("Cuisine", ""),
         RoomItem("Salle de bain", ""),
         RoomItem("Chambre", "")
     )
+
+    // Liste des pièces
+    private var address: String = ""
+    private var checkIn: Boolean = true
+    private val rooms: MutableList<RoomItem> = mutableListOf<RoomItem>()
+
+    private lateinit var roomAddressPDF: String
+    private lateinit var checkTypePDF: String
+    private lateinit var frenchDatePDF: String
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
@@ -64,6 +81,25 @@ class NewCheckInOutFragment : Fragment() {
         validateBtn.setOnClickListener {
             signatureView.setImageBitmap(signaturePad.signatureBitmap)
             signaturePad.clear()
+        }
+
+        if (arguments != null) {
+            arguments?.let { bundle ->
+                address = bundle.getString("address") ?: ""
+                binding.addressField.setText(address)
+                checkIn = bundle.getBoolean("checkIn")
+                binding.entryExitRadioGroup.check(if (!checkIn) R.id.exitRadioButton else R.id.entryRadioButton)
+
+                val roomNames = bundle.getStringArray("roomNames") ?: emptyArray()
+                val conditions = bundle.getStringArray("conditions") ?: emptyArray()
+
+                // Afficher chaque pièce et sa condition
+                for (i in roomNames.indices) {
+                    rooms.add(RoomItem(roomNames[i], conditions[i]))
+                }
+            }
+        } else if (rooms.isEmpty()) {
+            rooms.addAll(defaultRooms)
         }
 
         return binding.root
@@ -93,7 +129,10 @@ class NewCheckInOutFragment : Fragment() {
 
     // Affiche une boîte de dialogue pour demander le nom du fichier PDF
     private fun showFileNameDialog(updatedRooms: List<RoomItem>) {
-        val defaultPdfName = "etat_des_lieux_${System.currentTimeMillis()}.pdf"
+        roomAddressPDF = binding.addressField.text.toString()
+        checkTypePDF = if (binding.entryExitRadioGroup.checkedRadioButtonId == R.id.entryRadioButton) "Entrée" else "Sortie"
+        frenchDatePDF = SimpleDateFormat("dd-MM-yyyy", Locale.FRENCH).format(Date(System.currentTimeMillis()))
+        val defaultPdfName = "EtatDesLieux_${roomAddressPDF}_${checkTypePDF}_${frenchDatePDF}.pdf"
 
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Nom du fichier PDF")
@@ -126,11 +165,18 @@ class NewCheckInOutFragment : Fragment() {
         val pdf = PdfDocument(writer)
         val document = Document(pdf)
 
-        document.add(Paragraph("État des lieux du logement"))
+        // Styles
+        val boldFont: PdfFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
 
-        val table = Table(floatArrayOf(1f, 3f))
-        table.addCell(Cell().add(Paragraph("Pièce")))
-        table.addCell(Cell().add(Paragraph("État")))
+        document.add(Paragraph("État des lieux du logement")
+            .setFont(boldFont)
+            .setFontSize(24f)
+            .setTextAlignment(TextAlignment.CENTER))
+        document.add(Paragraph("$roomAddressPDF - $checkTypePDF - $frenchDatePDF"))
+
+        val table = Table(floatArrayOf(1f, 3f)).useAllAvailableWidth()
+        table.addCell(Cell().add(Paragraph("Pièce").setFont(boldFont)))
+        table.addCell(Cell().add(Paragraph("État").setFont(boldFont)))
 
         rooms.forEach { room ->
             table.addCell(Cell().add(Paragraph(room.roomName)))
@@ -139,11 +185,13 @@ class NewCheckInOutFragment : Fragment() {
 
         document.add(table)
         // Ajouter l'image de signature à la fin du PDF
-        val signatureBitmap = imageViewToBitmap(signatureView)
-        val imageBytes = bitmapToByteArray(signatureBitmap)
-        val imageData = ImageDataFactory.create(imageBytes)
-        val image = Image(imageData)
-        document.add(image)
+        if (signatureView.drawable != null) {
+            val signatureBitmap = imageViewToBitmap(signatureView)
+            val imageBytes = bitmapToByteArray(signatureBitmap)
+            val imageData = ImageDataFactory.create(imageBytes)
+            val image = Image(imageData)
+            document.add(image)
+        }
         document.close()
 
         Toast.makeText(context, "PDF généré: ${pdfFile.absolutePath}", Toast.LENGTH_LONG).show()
@@ -151,11 +199,7 @@ class NewCheckInOutFragment : Fragment() {
     }
 
     private fun imageViewToBitmap(imageView: ImageView): Bitmap {
-        imageView.isDrawingCacheEnabled = true
-        imageView.buildDrawingCache()
-        val bitmap = Bitmap.createBitmap(imageView.drawingCache)
-        imageView.isDrawingCacheEnabled = false
-        return bitmap
+        return (imageView.drawable as BitmapDrawable).bitmap
     }
 
     private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {

@@ -9,7 +9,11 @@
         android:id="@+id/navigation_checkinout_list"
         android:name="com.example.mylogitrack.ui.checkinout_list.CheckInOutListFragment"
         android:label="@string/title_checkinout_list"
-        tools:layout="@layout/fragment_checkinout_list" />
+        tools:layout="@layout/fragment_checkinout_list">
+        <action
+            android:id="@+id/action_checkinout_list_to_new_checkinout"
+            app:destination="@id/navigation_new_checkinout" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_new_checkinout"

@@ -57,6 +57,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     // Firebase
     implementation("com.google.firebase:firebase-auth:23.0.0")
+    implementation("com.google.firebase:firebase-database:21.0.0")
+    implementation("com.google.firebase:firebase-firestore-ktx:25.1.0")
     // Signature
     implementation("com.github.gcacace:signature-pad:1.3.1")
     // PDF
